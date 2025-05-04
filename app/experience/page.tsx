@@ -1,58 +1,91 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+'use client'
 
-const experiences = [
-  {
-    title: "Araştırma Asistanı",
-    company: "Üniversite Fizik Laboratuvarı",
-    period: "2023 - Devam Ediyor",
-    description: "Parçacık fiziği deneylerinde veri toplama ve analiz süreçlerinde aktif rol alıyorum. MATLAB ve Python kullanarak deney sonuçlarını işliyor ve raporluyorum.",
-    skills: ["Veri Analizi", "MATLAB", "Python", "Laboratuvar Teknikleri"]
-  },
-  {
-    title: "Stajyer Fizik Mühendisi",
-    company: "XYZ Araştırma Merkezi",
-    period: "2023 Yaz",
-    description: "Yüksek enerji fiziği laboratuvarında staj yaptım. Deney düzeneklerinin kurulumu ve kalibrasyonunda görev aldım.",
-    skills: ["Deney Tasarımı", "Kalibrasyon", "Veri Toplama"]
-  },
-  {
-    title: "Proje Asistanı",
-    company: "Üniversite Fizik Kulübü",
-    period: "2022 - 2023",
-    description: "Öğrenci projelerinde mentörlük yaparak, teorik fizik ve programlama konularında destek sağladım.",
-    skills: ["Mentorluk", "Proje Yönetimi", "Fizik Eğitimi"]
-  }
-]
+import { useEffect, useState } from 'react'
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
+
+interface Experience {
+  id: string
+  title: string
+  company: string
+  period: string
+  description: string
+  skills: string[]
+}
+
+interface ExperienceData {
+  description: string
+  experiences: Experience[]
+}
 
 export default function ExperiencePage() {
-  return (
-    <main className="container mx-auto px-4 py-16">
-      <h1 className="text-4xl font-bold mb-8">Deneyim</h1>
-      <p className="text-muted-foreground mb-12 max-w-2xl">
-        Akademik ve profesyonel alanda edindiğim deneyimler. Her deneyim, fizik ve mühendislik
-        alanındaki bilgi ve becerilerimi geliştirmeme katkı sağladı.
-      </p>
+  const [experienceData, setExperienceData] = useState<ExperienceData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-      <div className="space-y-8">
-        {experiences.map((experience, index) => (
-          <Card key={index}>
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle>{experience.title}</CardTitle>
-                  <CardDescription>{experience.company}</CardDescription>
-                </div>
-                <Badge variant="outline">{experience.period}</Badge>
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/experience')
+        if (!response.ok) throw new Error('Veri alınamadı')
+        const data = await response.json()
+        if (data.success && data.data) {
+          setExperienceData(data.data)
+        }
+      } catch (error) {
+        console.error('Veri yükleme hatası:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-4 space-y-8">
+        <Skeleton className="h-8 w-[200px]" />
+        <Skeleton className="h-16 w-full" />
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-48 w-full" />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (!experienceData) {
+    return (
+      <div className="container mx-auto p-4">
+        <p>Veriler yüklenirken bir hata oluştu.</p>
+      </div>
+    )
+  }
+
+  return (
+    <main className="container mx-auto p-4 space-y-8">
+      <section className="space-y-4">
+        <h1 className="text-3xl font-bold">Deneyim</h1>
+        <p className="text-muted-foreground">
+          {experienceData.description}
+        </p>
+      </section>
+
+      <section className="grid gap-4">
+        {experienceData.experiences.map((experience) => (
+          <Card key={experience.id}>
+            <CardContent className="pt-6 space-y-4">
+              <div>
+                <h2 className="text-xl font-semibold">{experience.title}</h2>
+                <p className="text-muted-foreground">{experience.company}</p>
+                <p className="text-sm text-muted-foreground">{experience.period}</p>
               </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                {experience.description}
-              </p>
+              <p>{experience.description}</p>
               <div className="flex flex-wrap gap-2">
-                {experience.skills.map((skill, skillIndex) => (
-                  <Badge key={skillIndex} variant="secondary">
+                {experience.skills.map((skill, index) => (
+                  <Badge key={index} variant="secondary">
                     {skill}
                   </Badge>
                 ))}
@@ -60,8 +93,7 @@ export default function ExperiencePage() {
             </CardContent>
           </Card>
         ))}
-      </div>
+      </section>
     </main>
   )
 }
-

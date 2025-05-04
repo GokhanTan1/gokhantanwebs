@@ -1,49 +1,131 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+'use client'
+
+import { useEffect, useState } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ArrowUpRight } from "lucide-react"
-import Link from "next/link"
-import Image from "next/image"
-import { projects } from "@/lib/projects"
+import { Github, Link as LinkIcon } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
+
+interface Project {
+  id: string
+  title: string
+  description: string
+  longDescription: string
+  image: string
+  tags: string[]
+  objectives: string[]
+  technologies: string[]
+  results: string[]
+  link?: string
+  githubLink?: string
+}
+
+interface ProjectsData {
+  projects: Project[]
+}
 
 export default function PortfolioPage() {
-  return (
-    <main className="container mx-auto px-4 py-16">
-      <h1 className="text-4xl font-bold mb-8">Projeler</h1>
-      <p className="text-muted-foreground mb-12 max-w-2xl">
-        Fizik mühendisliği eğitimim sırasında geliştirdiğim projeler. Her proje, teorik bilgilerin
-        pratik uygulamalarla birleştirilmesini gösteriyor.
-      </p>
+  const [projectsData, setProjectsData] = useState<ProjectsData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {projects.map((project) => (
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/projects')
+        if (!response.ok) throw new Error('Veri alınamadı')
+        const data = await response.json()
+        if (data.success && data.data) {
+          setProjectsData(data.data)
+        }
+      } catch (error) {
+        console.error('Veri yükleme hatası:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <Card key={i}>
+              <CardContent className="p-0">
+                <Skeleton className="h-48 w-full" />
+                <div className="p-6 space-y-4">
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-16 w-full" />
+                  <div className="flex gap-2">
+                    <Skeleton className="h-6 w-20" />
+                    <Skeleton className="h-6 w-20" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (!projectsData) {
+    return (
+      <div className="container mx-auto p-4">
+        <p>Veriler yüklenirken bir hata oluştu.</p>
+      </div>
+    )
+  }
+
+  return (
+    <main className="container mx-auto p-4 space-y-8">
+      <h1 className="text-3xl font-bold">Projeler</h1>
+      
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {projectsData.projects.map((project) => (
           <Card key={project.id} className="overflow-hidden">
-            <div className="relative h-48">
-              <Image
-                src={project.image}
-                alt={project.title}
-                fill
-                className="object-cover"
-              />
-            </div>
-            <CardHeader>
-              <CardTitle>{project.title}</CardTitle>
-              <CardDescription>{project.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2 mb-4">
-                {project.tags.map((tag, tagIndex) => (
-                  <Badge key={tagIndex} variant="secondary">
-                    {tag}
-                  </Badge>
-                ))}
+            <CardContent className="p-0">
+              <div className="relative h-48 overflow-hidden">
+                <Image
+                  src={project.image}
+                  alt={project.title}
+                  fill
+                  className="object-cover transition-transform hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                />
               </div>
-              <Button asChild variant="outline" className="w-full">
-                <Link href={`/portfolio/${project.id}`}>
-                  Detayları Gör
-                  <ArrowUpRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
+              <div className="p-6 space-y-4">
+                <h2 className="text-xl font-semibold">{project.title}</h2>
+                <p className="text-muted-foreground">{project.description}</p>
+                <div className="flex flex-wrap gap-2">
+                  {project.tags.map((tag, index) => (
+                    <Badge key={index} variant="secondary">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={`/portfolio/${project.id}`}>
+                      <LinkIcon className="mr-2 h-4 w-4" />
+                      Detayları Gör
+                    </Link>
+                  </Button>
+                  {project.githubLink && (
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={project.githubLink} target="_blank" rel="noopener noreferrer">
+                        <Github className="mr-2 h-4 w-4" />
+                        GitHub
+                      </Link>
+                    </Button>
+                  )}
+                </div>
+              </div>
             </CardContent>
           </Card>
         ))}
@@ -51,4 +133,3 @@ export default function PortfolioPage() {
     </main>
   )
 }
-

@@ -1,0 +1,66 @@
+{
+  "personalInfo": {
+    "name": "Gökhan Tan",
+    "title": "Fizik Mühendisliği Öğrencisi",
+    "location": "İstanbul, Türkiye",
+    "email": "gokhantan186@gmail.com",
+    "phone": "+90 545 504 6225",
+    "linkedin": "www.linkedin.com/in/tangokhan",
+    "description": "Merhaba, ben Gökhan Tan. İstanbul Teknik Üniversitesi Fizik Mühendisliği bölümünde üçüncü sınıf öğrencisiyim. Mühendisliğin farklı alanlarına, teknolojiye ve bilime karşı doğal bir ilgim var. Yeni şeyler öğrenmekten ve edindiğim bilgileri analiz, simülasyon ve tasarım gibi pratik uygulamalara dönüştürmekten keyif alıyorum; bu benim için bir tutku haline geldi.\n\nÖzellikle malzeme bilimi, üretim yöntemleri ve mühendislik prosesleri alanları beni heyecanlandırıyor. Bu konularda çeşitli kaynaklardan bilgi ediniyor, malzeme karakterizasyonunda kullanılan temel yöntemleri ve ekipmanları öğreniyorum. Aynı zamanda sektördeki yenilikleri takip ederek, bu alanlarda kullanılan analiz, simülasyon ve tasarım programlarını öğrenmeye ve kullanmaya özen gösteriyorum.\n\nBu çerçevede, SolidWorks ve Blender kullanarak teknik çizim ve tasarım becerilerimi geliştirmek amacıyla çeşitli parçalar ve mekanik sistemler modelledim. Ansys Workbench yazılımıyla, özellikle kompozit malzemeler üzerine yoğunlaşarak yapısal analizler, akışkanlar dinamiği, titreşim ve ısı transferi konularında çeşitli çalışmalar yaptım. Ayrıca, COMSOL ile çoklu fizik analizleri ve KiCad kullanarak PCB tasarımları gerçekleştirdim. Optik alanında ise Ansys Zemax OpticStudio ile aydınlatma sistemleri ve mercek tasarımları üzerine çalıştım.\n\nÖzetle, kariyerimde malzeme bilimi ve üretim alanlarında derinleşmeyi, aynı zamanda farklı mühendislik disiplinlerini bir araya getiren projelerde yer almayı hedefliyorum. Astolavista"
+  },
+  "skills": {
+    "technicalPrograms": [
+      "MATLAB",
+      "Python",
+      "SolidWorks",
+      "Blender",
+      "Ansys Workbench",
+      "COMSOL",
+      "KiCad",
+      "Zemax OpticStudio",
+      "MoldFlow",
+      "PolyFlow",
+      "Magmasoft",
+      "PVsyst",
+      "MS Office Proğramları"
+    ],
+    "technicalCompetencies": [
+      "Deney Tasarımı",
+      "Ölçüm Teknikleri",
+      "Veri Toplama",
+      "Kalibrasyon",
+      "Veri Analizi",
+      "Simülasyon",
+      "Modelleme",
+      "Prototipleme",
+      "Üretim Süreçleri",
+      "Malzeme Karakterizasyonu",
+      "Mekanik Tasarım"
+    ],
+    "softSkills": [
+      "Problem Çözme",
+      "Analitik Düşünme",
+      "Takım Çalışması",
+      "İletişim"
+    ]
+  },
+  "education": [
+    {
+      "degree": "Fizik Mühendisliği",
+      "school": "İstanbul Teknik Üniversitesi",
+      "years": "2020 - Devam Ediyor",
+      "details": [
+        "Temel fizik ve mühendislik prensipleri",
+        "İleri matematik ve analiz teknikleri",
+        "Laboratuvar çalışmaları ve deneysel fizik",
+        "Bilgisayar destekli tasarım ve simülasyon"
+      ]
+    },
+    {
+      "degree": "Elektrik Önlisans",
+      "school": "Osmaniye KorkutAta Üniversitesi",
+      "years": "",
+      "details": []
+    }
+  ]
+}

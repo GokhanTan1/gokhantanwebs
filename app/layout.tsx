@@ -5,12 +5,26 @@ import "./globals.css"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/toaster"
+import { MobileNav } from "@/components/ui/mobile-nav"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "Gökhan Tan - Fizik Mühendisliği Öğrencisi",
   description: "Gökhan Tan'ın kişisel websitesi. Fizik mühendisliği öğrencisi, araştırmacı ve teknoloji tutkunu.",
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
+  themeColor: '#000000',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: "Gökhan Tan",
+  },
 }
 
 export default function RootLayout({
@@ -19,14 +33,17 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="tr">
+    <html lang="tr" className="antialiased">
       <body className={inter.className}>
         <header className="border-b">
           <div className="container mx-auto px-4">
             <nav className="flex items-center justify-between h-16">
-              <Link href="/" className="font-bold text-lg">
-                Gökhan Tan
-              </Link>
+              <div className="flex items-center gap-2">
+                <MobileNav />
+                <Link href="/" className="font-bold text-lg">
+                  Gökhan Tan
+                </Link>
+              </div>
               <div className="hidden md:flex space-x-4">
                 <Button variant="ghost" asChild>
                   <Link href="/about">Hakkımda</Link>

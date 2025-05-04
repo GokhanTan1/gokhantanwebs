@@ -1,84 +1,150 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
+
+interface AboutData {
+  personalInfo: {
+    name: string
+    title: string
+    location: string
+    email: string
+    phone: string
+    linkedin: string
+    description: string
+  }
+  skills: {
+    technicalPrograms: string[]
+    technicalCompetencies: string[]
+    softSkills: string[]
+  }
+  education: {
+    degree: string
+    school: string
+    years: string
+    details: string[]
+  }[]
+}
 
 export default function AboutPage() {
-  return (
-    <main className="container mx-auto px-4 py-16">
-      <h1 className="text-4xl font-bold mb-8">Hakkımda</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <Card>
-          <CardContent className="p-6">
-            <h2 className="text-2xl font-semibold mb-4">Kişisel Bilgiler</h2>
-            <p className="text-muted-foreground mb-6">
-              Merhaba! Ben Gökhan Tan. Fizik mühendisliği öğrencisi olarak, bilim ve teknolojinin kesiştiği noktada çalışmalar yapıyorum. 
-              Analitik düşünme ve problem çözme yeteneklerimi kullanarak, karmaşık problemlere yenilikçi çözümler üretmeye odaklanıyorum.
-            </p>
-            <div className="space-y-2">
-              <p><strong>Eğitim:</strong> Fizik Mühendisliği</p>
-              <p><strong>Konum:</strong> İstanbul, Türkiye</p>
-              <p><strong>E-posta:</strong> your.email@example.com</p>
-            </div>
-          </CardContent>
-        </Card>
+  const [aboutData, setAboutData] = useState<AboutData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-        <Card>
-          <CardContent className="p-6">
-            <h2 className="text-2xl font-semibold mb-4">Yetenekler</h2>
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-lg font-medium mb-2">Teknik Beceriler</h3>
-                <div className="flex flex-wrap gap-2">
-                  <Badge>MATLAB</Badge>
-                  <Badge>Python</Badge>
-                  <Badge>CAD Yazılımları</Badge>
-                  <Badge>Veri Analizi</Badge>
-                  <Badge>Simülasyon</Badge>
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-medium mb-2">Laboratuvar Becerileri</h3>
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary">Deney Tasarımı</Badge>
-                  <Badge variant="secondary">Ölçüm Teknikleri</Badge>
-                  <Badge variant="secondary">Veri Toplama</Badge>
-                  <Badge variant="secondary">Kalibrasyon</Badge>
-                </div>
-              </div>
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/about')
+        if (!response.ok) throw new Error('Veri alınamadı')
+        const data = await response.json()
+        if (data.success && data.data) {
+          setAboutData(data.data)
+        }
+      } catch (error) {
+        console.error('Veri yükleme hatası:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
-              <div>
-                <h3 className="text-lg font-medium mb-2">Soft Skills</h3>
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant="outline">Problem Çözme</Badge>
-                  <Badge variant="outline">Analitik Düşünme</Badge>
-                  <Badge variant="outline">Takım Çalışması</Badge>
-                  <Badge variant="outline">İletişim</Badge>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+    fetchData()
+  }, [])
 
-        <Card className="md:col-span-2">
-          <CardContent className="p-6">
-            <h2 className="text-2xl font-semibold mb-4">Eğitim Geçmişi</h2>
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-medium">Fizik Mühendisliği</h3>
-                <p className="text-muted-foreground">Üniversite Adı, 2020 - Devam Ediyor</p>
-                <p className="mt-2">
-                  • Temel fizik ve mühendislik prensipleri
-                  • İleri matematik ve analiz teknikleri
-                  • Laboratuvar çalışmaları ve deneysel fizik
-                  • Bilgisayar destekli tasarım ve simülasyon
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-4 space-y-8">
+        <Skeleton className="h-8 w-[200px]" />
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-8 w-[150px]" />
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-8 w-[150px]" />
+        <Skeleton className="h-24 w-full" />
       </div>
+    )
+  }
+
+  if (!aboutData) {
+    return (
+      <div className="container mx-auto p-4">
+        <p>Veriler yüklenirken bir hata oluştu.</p>
+      </div>
+    )
+  }
+
+  const { personalInfo, skills, education } = aboutData
+
+  return (
+    <main className="container mx-auto p-4 space-y-8">
+      {/* Kişisel Bilgiler */}
+      <section className="space-y-4">
+        <h1 className="text-3xl font-bold">{personalInfo.name}</h1>
+        <h2 className="text-xl text-muted-foreground">{personalInfo.title}</h2>
+        <div className="prose max-w-none dark:prose-invert">
+          {personalInfo.description.split('\n').map((paragraph, index) => (
+            <p key={index}>{paragraph}</p>
+          ))}
+        </div>
+      </section>
+
+      {/* Yetenekler */}
+      <section className="space-y-4">
+        <h2 className="text-2xl font-semibold">Yetenekler</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card>
+            <CardContent className="pt-6">
+              <h3 className="font-semibold mb-4">Teknik Programlar</h3>
+              <ul className="list-disc pl-4 space-y-1">
+                {skills.technicalPrograms.map((skill, index) => (
+                  <li key={index}>{skill}</li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <h3 className="font-semibold mb-4">Teknik Yetkinlikler</h3>
+              <ul className="list-disc pl-4 space-y-1">
+                {skills.technicalCompetencies.map((skill, index) => (
+                  <li key={index}>{skill}</li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <h3 className="font-semibold mb-4">Kişisel Yetkinlikler</h3>
+              <ul className="list-disc pl-4 space-y-1">
+                {skills.softSkills.map((skill, index) => (
+                  <li key={index}>{skill}</li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Eğitim */}
+      <section className="space-y-4">
+        <h2 className="text-2xl font-semibold">Eğitim</h2>
+        <div className="grid gap-4">
+          {education.map((edu, index) => (
+            <Card key={index}>
+              <CardContent className="pt-6">
+                <h3 className="font-semibold">{edu.degree}</h3>
+                <p className="text-muted-foreground">{edu.school}</p>
+                <p className="text-sm text-muted-foreground">{edu.years}</p>
+                {edu.details.length > 0 && (
+                  <ul className="list-disc pl-4 mt-2 space-y-1">
+                    {edu.details.map((detail, idx) => (
+                      <li key={idx}>{detail}</li>
+                    ))}
+                  </ul>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
     </main>
   )
 }
-

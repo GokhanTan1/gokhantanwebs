@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server'
-import { writeFile } from 'fs/promises'
-import { join } from 'path'
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
+import { supabaseAdmin } from '@/lib/supabase'
 
 if (!process.env.JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable tanımlanmamış')
@@ -65,29 +64,50 @@ export async function POST(request: Request) {
     const originalName = file.name.toLowerCase().replace(/[^a-z0-9.]/g, '-')
     const fileName = `${timestamp}-${originalName}`
 
-    // Dosyayı kaydet
-    const publicPath = join(process.cwd(), 'public')
-    const uploadDir = fileType === 'image' ? 'uploads/images' : 'uploads/documents'
-    const fullPath = join(publicPath, uploadDir)
+    // Dosyayı Supabase'e yükle
+    const bucketName = fileType === 'image' ? 'images' : 'documents'
+    
+    const { data, error } = await supabaseAdmin
+      .storage
+      .from(bucketName)
+      .upload(fileName, buffer, {
+        contentType: file.type,
+        cacheControl: '3600'
+      })
 
-    try {
-      await writeFile(join(fullPath, fileName), buffer)
-    } catch (error) {
-      console.error('Dosya yazma hatası:', error)
+    if (error) {
+      console.error('Supabase yükleme hatası:', error)
       return NextResponse.json(
-        { success: false, error: 'Dosya kaydedilemedi. Dizin erişim hakları kontrol edilmeli.' },
+        { success: false, error: 'Dosya yüklenemedi: ' + error.message },
         { status: 500 }
       )
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      path: `/${uploadDir}/${fileName}`
+    const { data: urlData } = supabaseAdmin
+      .storage
+      .from(bucketName)
+      .getPublicUrl(fileName)
+
+    return NextResponse.json({
+      success: true,
+      path: urlData.publicUrl
     })
 
   } catch (error) {
+    console.error('Upload hatası:', error)
+    let errorMessage = 'Bilinmeyen hata'
+    
+    if (error instanceof Error) {
+      errorMessage = error.message
+      console.error('Hata detayı:', error.stack)
+    }
+
     return NextResponse.json(
-      { success: false, error: 'Dosya yüklenirken bir hata oluştu' },
+      {
+        success: false,
+        error: 'Dosya yüklenirken bir hata oluştu: ' + errorMessage,
+        details: error instanceof Error ? error.stack : undefined
+      },
       { status: 500 }
     )
   }

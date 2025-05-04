@@ -7,13 +7,9 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    unoptimized: true,
     domains: ['spjjlvspryeoxurejzig.supabase.co'],
   },
   experimental: {
-    webpackBuildWorker: true,
-    parallelServerBuildTraces: true,
-    parallelServerCompiles: true,
     serverActions: true,
   },
   async headers() {
@@ -30,5 +26,3 @@ const nextConfig = {
     ]
   },
 }
-
-export default nextConfig

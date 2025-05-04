@@ -353,6 +353,15 @@ export default function DashboardPage() {
   }, [router])
 
   const handleFileUpload = async (file: File, type: 'image' | 'document' | 'profile') => {
+    if (!file) {
+      toast({
+        variant: "destructive",
+        title: "Hata!",
+        description: "Lütfen bir dosya seçin.",
+      })
+      return
+    }
+
     const formData = new FormData()
     formData.append('file', file)
     formData.append('type', type)
@@ -363,45 +372,62 @@ export default function DashboardPage() {
         body: formData,
       })
 
-      const result = await response.json()
-      if (result.success) {
-        if (type === 'profile') {
-          setProfileData({
-            ...profileData,
-            profilePhoto: result.path
-          })
-        } else if (type === 'image') {
-          if (selectedProject) {
-            setSelectedProject({
-              ...selectedProject,
-              image: result.path
-            })
-            // Projeyi otomatik olarak güncelle
-            const updatedProject = {
-              ...selectedProject,
-              image: result.path
-            }
-            handleUpdateProject(updatedProject)
-          }
-        } else {
-          setSelectedProject({
-            ...selectedProject!,
-            link: result.path
-          })
-        }
-        toast({
-          title: "Başarılı!",
-          description: "Dosya yüklendi.",
-        })
-      } else {
-        throw new Error(result.error)
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Dosya yüklenirken bir hata oluştu')
       }
+
+      const result = await response.json()
+      
+      if (!result.success || !result.path) {
+        throw new Error('Dosya yükleme başarısız oldu: Geçersiz sunucu yanıtı')
+      }
+
+      if (type === 'profile') {
+        setProfileData({
+          ...profileData,
+          profilePhoto: result.path
+        })
+      } else if (type === 'image') {
+        if (selectedProject) {
+          setSelectedProject({
+            ...selectedProject,
+            image: result.path
+          })
+          // Projeyi otomatik olarak güncelle
+          const updatedProject = {
+            ...selectedProject,
+            image: result.path
+          }
+          handleUpdateProject(updatedProject)
+        }
+      } else {
+        setSelectedProject({
+          ...selectedProject!,
+          link: result.path
+        })
+      }
+
+      toast({
+        title: "Başarılı!",
+        description: "Dosya yüklendi.",
+      })
     } catch (error: any) {
+      console.error('Dosya yükleme hatası:', error)
+      const errorDetails = error.response ? await error.response.json() : null
+      const errorMessage = errorDetails?.error || error.message || "Dosya yüklenirken bir hata oluştu."
+      
       toast({
         variant: "destructive",
         title: "Hata!",
-        description: error.message || "Dosya yüklenirken bir hata oluştu.",
+        description: errorMessage,
       })
+
+      if (errorDetails?.details) {
+        console.error('Hata detayları:', errorDetails.details)
+      }
+      
+      return null
     }
   }
 

@@ -371,10 +371,18 @@ export default function DashboardPage() {
             profilePhoto: result.path
           })
         } else if (type === 'image') {
-          setSelectedProject({
-            ...selectedProject!,
-            image: result.path
-          })
+          if (selectedProject) {
+            setSelectedProject({
+              ...selectedProject,
+              image: result.path
+            })
+            // Projeyi otomatik olarak güncelle
+            const updatedProject = {
+              ...selectedProject,
+              image: result.path
+            }
+            handleUpdateProject(updatedProject)
+          }
         } else {
           setSelectedProject({
             ...selectedProject!,
@@ -910,24 +918,40 @@ export default function DashboardPage() {
                       />
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                       <label>Proje Görseli</label>
-                      <div className="flex items-center gap-4">
-                        <Input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0]
-                            if (file) handleFileUpload(file, 'image')
-                          }}
-                        />
-                        {selectedProject.image && (
-                          <img
-                            src={selectedProject.image}
-                            alt="Proje görseli"
-                            className="w-20 h-20 object-cover rounded"
+                      <div className="flex flex-col space-y-4">
+                        <div className="relative w-full h-64 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg overflow-hidden hover:border-gray-400 transition-colors">
+                          {selectedProject.image ? (
+                            <>
+                              <Image
+                                src={selectedProject.image}
+                                alt="Proje görseli"
+                                fill
+                                className="object-contain"
+                              />
+                              <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <p className="text-white">Görseli değiştirmek için tıklayın</p>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <p className="text-gray-500">Görsel yüklemek için tıklayın</p>
+                            </div>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0]
+                              if (file) handleFileUpload(file, 'image')
+                            }}
                           />
-                        )}
+                        </div>
+                        <p className="text-sm text-gray-500">
+                          PNG, JPG veya WebP formatında bir görsel yükleyin.
+                        </p>
                       </div>
                     </div>
 

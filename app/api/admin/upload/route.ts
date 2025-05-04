@@ -69,8 +69,16 @@ export async function POST(request: Request) {
     const publicPath = join(process.cwd(), 'public')
     const uploadDir = fileType === 'image' ? 'uploads/images' : 'uploads/documents'
     const fullPath = join(publicPath, uploadDir)
-    
-    await writeFile(join(fullPath, fileName), buffer)
+
+    try {
+      await writeFile(join(fullPath, fileName), buffer)
+    } catch (error) {
+      console.error('Dosya yazma hatası:', error)
+      return NextResponse.json(
+        { success: false, error: 'Dosya kaydedilemedi. Dizin erişim hakları kontrol edilmeli.' },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json({ 
       success: true, 
